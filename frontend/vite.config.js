@@ -14,22 +14,16 @@ export default defineConfig({
         name: 'SFA Agritec',
         short_name: 'Agritec',
         description: 'Sales Force Automation for PT. Agribisnis Technology Indonesia',
-        theme_color: '#4CAF50',
+        theme_color: '#2E7D32',
+        background_color: '#ffffff',
+        display: 'standalone',
+        start_url: '/',
         icons: [
-          {
-            src: '/pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       },
       workbox: {
-        // configure offline caching
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/api'),
@@ -37,9 +31,16 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               networkTimeoutSeconds: 5,
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            // Cache integration routes (weather, commodity prices) longer
+            urlPattern: ({ url }) => url.pathname.includes('/integration/'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'integration-cache',
+              cacheableResponse: { statuses: [0, 200] }
             }
           }
         ]
@@ -47,8 +48,17 @@ export default defineConfig({
     })
   ],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+    alias: { '@': path.resolve(__dirname, './src') }
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'vue-router', 'vuex'],
+          'vendor-vuetify': ['vuetify'],
+        }
+      }
+    }
+  }
 })
