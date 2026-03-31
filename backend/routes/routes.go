@@ -27,21 +27,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 
-	// Root Route (Mencegah 404 ketika domain utama dibuka)
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "success",
-			"message": "Welcome to Agritec API. System is up and running.",
-		})
-	})
-
 	// Controllers
 	authController := controllers.NewAuthController(db)
 	visitController := controllers.NewVisitController(db)
-	distributorController := controllers.NewDistributorController(db)
-	educationController := controllers.NewEducationController(db)
-	notificationController := controllers.NewNotificationController(db)
-	integrationController := controllers.NewIntegrationController(db)
 
 	// API V1 Group
 	v1 := r.Group("/api/v1")
@@ -59,56 +47,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		sales.Use(middleware.RoleMiddleware("sales"))
 		{
 			sales.POST("/visits", visitController.CreateVisit) // create a visit
-			sales.GET("/visits", visitController.GetVisits)    // list own visits
 		}
 
-		// Supervisor group route (Protected by JWT)
-		supervisor := v1.Group("/supervisor")
-		supervisor.Use(middleware.JWTAuthMiddleware())
-		supervisor.Use(middleware.RoleMiddleware("supervisor"))
-		{
-			supervisor.GET("/visits", visitController.GetVisits) // list all visits
-		}
-
-		// Distributor Service (JWT required)
-		distributor := v1.Group("/distributors")
-		distributor.Use(middleware.JWTAuthMiddleware())
-		{
-			distributor.GET("/", distributorController.GetDistributors)
-			distributor.GET("/:id", distributorController.GetDistributorByID)
-			distributor.GET("/stock", distributorController.CheckStock) // ?distributor_id=X
-			distributor.GET("/debts", distributorController.GetDebts)   // ?distributor_id=X
-			distributor.POST("/debts", distributorController.CreateDebt)
-		}
-
-		// Education Service (GET: public, POST: supervisor only)
-		education := v1.Group("/education")
-		{
-			education.GET("/content", educationController.GetContents) // ?category=X
-			education.GET("/content/:id", educationController.GetContentByID)
-		}
-		educationAuth := v1.Group("/education")
-		educationAuth.Use(middleware.JWTAuthMiddleware())
-		educationAuth.Use(middleware.RoleMiddleware("supervisor"))
-		{
-			educationAuth.POST("/content", educationController.CreateContent)
-		}
-
-		// Notification Service (JWT required)
-		notification := v1.Group("/notifications")
-		notification.Use(middleware.JWTAuthMiddleware())
-		{
-			notification.GET("/", notificationController.GetNotifications)
-			notification.POST("/", notificationController.CreateNotification)
-			notification.PUT("/:id/read", notificationController.MarkAsRead)
-		}
-
-		// External Integration Service (public)
-		integration := v1.Group("/integration")
-		{
-			integration.GET("/weather", integrationController.GetWeather) // ?city=malang
-			integration.GET("/commodity-prices", integrationController.GetCommodityPrices)
-		}
+		// Tambahkan rute untuk supervisor/farmer lainnya
 	}
 
 	return r

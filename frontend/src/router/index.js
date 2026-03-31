@@ -34,17 +34,6 @@ const routes = [
         name: 'Farmer',
         component: () => import('../views/FarmerEducation.vue'),
         meta: { requiresAuth: true, role: 'farmer' }
-    },
-    {
-        path: '/distributor',
-        name: 'Distributor',
-        component: () => import('../views/DistributorManagement.vue'),
-        meta: { requiresAuth: true, role: 'distributor' }
-    },
-    {
-        // Catch-all 404
-        path: '/:pathMatch(.*)*',
-        redirect: '/login'
     }
 ]
 
@@ -59,12 +48,12 @@ router.beforeEach((to, from, next) => {
         next('/login')
     } else if (to.meta.requiresAuth && store.getters.isAuthenticated) {
         const role = store.getters.userRole
+        // Check if role is allowed (Optional Strict Validation)
         if (to.meta.role && to.meta.role !== role) {
-            // Role-based redirect fallback
+            // Basic fallback
             if (role === 'sales') next('/sales')
             else if (role === 'supervisor') next('/supervisor')
             else if (role === 'farmer') next('/farmer')
-            else if (role === 'distributor') next('/distributor')
             else next('/login')
         } else {
             next()
