@@ -1,3 +1,6 @@
+-- LEGACY (backend Go). JANGAN dijalankan di Supabase PoC.
+-- Skema aktif ada di supabase/migrations/.
+
 -- =========================================================================
 -- SQL Queries untuk inisialisasi awal di Supabase (Supabase GUI - SQL Editor)
 -- Supabase secara default memiliki PostGIS, jadi kita tinggal pastikan aktif extensionnya.

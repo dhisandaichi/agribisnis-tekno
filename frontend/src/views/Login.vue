@@ -1,14 +1,16 @@
 <template>
   <v-container fluid class="fill-height d-flex align-center justify-center">
     <v-card width="400" elevation="4">
-      <v-card-title class="text-center py-4 text-h5 primary--text">Login Agritec</v-card-title>
+      <v-card-title class="text-center py-4 text-h5 text-primary">Login Agritec</v-card-title>
       <v-card-text>
-        <v-alert v-if="error" type="error" class="mb-4" dense>{{ error }}</v-alert>
+        <v-alert v-if="error" type="error" class="mb-4" density="compact">{{ error }}</v-alert>
 
         <v-form @submit.prevent="handleLogin">
           <v-text-field
             v-model="email"
             label="Email"
+            type="email"
+            autocomplete="email"
             prepend-inner-icon="mdi-email"
             required
             variant="outlined"
@@ -17,6 +19,7 @@
             v-model="password"
             label="Password"
             type="password"
+            autocomplete="current-password"
             prepend-inner-icon="mdi-lock"
             required
             variant="outlined"
@@ -35,12 +38,16 @@
 </template>
 
 <script>
+import { homeFor } from '../store'
+
 export default {
   data() {
     return {
       email: '',
       password: '',
-      error: null,
+      error: this.$route.query.reason === 'role'
+        ? 'Role akun Anda belum memiliki akses ke aplikasi ini.'
+        : null,
       loading: false
     }
   },
@@ -48,19 +55,21 @@ export default {
     async handleLogin() {
       this.error = null
       this.loading = true
-      
+
       try {
         const user = await this.$store.dispatch('login', {
           email: this.email,
           password: this.password
         })
 
-        // Redirect based on role fetched from Database JWT
-        if (user.role === 'sales') this.$router.push('/sales')
-        else if (user.role === 'supervisor') this.$router.push('/supervisor')
-        else if (user.role === 'farmer') this.$router.push('/farmer')
-        else this.$router.push('/login') // fallback
-
+        const home = homeFor(user.role)
+        if (!home) {
+          await this.$store.dispatch('logout')
+          this.error = 'Role akun Anda belum memiliki akses ke aplikasi ini.'
+          return
+        }
+        const redirect = this.$route.query.redirect
+        this.$router.push(typeof redirect === 'string' && redirect.startsWith(home) ? redirect : home)
       } catch (err) {
         this.error = err.message || 'Login Gagal'
       } finally {

@@ -1,87 +1,123 @@
 import { createStore } from 'vuex'
+import { supabase } from '../services/supabase'
+import { getQueue, submitVisit, syncQueue } from '../services/visits'
 
-const API_URL = 'http://localhost:8080/api/v1'
+const ROLE_HOME = {
+    sales: '/sales',
+    supervisor: '/supervisor',
+    farmer: '/farmer'
+}
 
-export default createStore({
+export function homeFor(role) {
+    return ROLE_HOME[role] || null
+}
+
+async function loadUser(authUser) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, role')
+        .eq('id', authUser.id)
+        .single()
+    if (error) throw error
+    return data
+}
+
+let initPromise = null
+
+const store = createStore({
     state: {
-        user: JSON.parse(localStorage.getItem('user')) || null, // { id, email, role, token }
-        offlineVisits: [], // store pending visits when offline
+        user: null, // { id, email, full_name, role }
+        pendingVisits: 0 // kunjungan di antrean offline yang belum terkirim
     },
     mutations: {
         SET_USER(state, payload) {
             state.user = payload
-            if (payload) {
-                localStorage.setItem('user', JSON.stringify(payload))
-            } else {
-                localStorage.removeItem('user')
-            }
         },
-        ADD_OFFLINE_VISIT(state, visit) {
-            state.offlineVisits.push(visit)
-        },
-        CLEAR_OFFLINE_VISITS(state) {
-            state.offlineVisits = []
+        SET_PENDING(state, count) {
+            state.pendingVisits = count
         }
     },
     actions: {
-        async register(_, userData) {
-            const response = await fetch(`${API_URL}/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: userData.email,
-                    password: userData.password,
-                    role: userData.role
+        // Pulihkan sesi Supabase sekali saat app dibuka.
+        init({ commit, dispatch }) {
+            if (initPromise) return initPromise
+            initPromise = (async () => {
+                localStorage.removeItem('user') // sisa sesi versi backend Go
+                supabase.auth.onAuthStateChange(event => {
+                    if (event === 'SIGNED_OUT') commit('SET_USER', null)
                 })
-            })
-
-            const data = await response.json()
-            if (!response.ok) {
-                throw new Error(data.error || 'Terjadi kesalahan saat pendaftaran')
-            }
-            return data
+                const { data } = await supabase.auth.getSession()
+                if (data.session) {
+                    try {
+                        commit('SET_USER', await loadUser(data.session.user))
+                        dispatch('syncVisits')
+                    } catch (err) {
+                        console.error('Gagal memuat profil', err)
+                        await supabase.auth.signOut()
+                    }
+                }
+            })()
+            return initPromise
         },
 
-        async login({ commit }, credentials) {
-            const response = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: credentials.email,
-                    password: credentials.password
-                })
+        // Mengembalikan user jika langsung login, atau null jika perlu konfirmasi email.
+        async register({ commit }, { email, password, role, fullName }) {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { role, full_name: fullName },
+                    emailRedirectTo: `${window.location.origin}/login`
+                }
             })
-
-            const data = await response.json()
-            if (!response.ok) {
-                throw new Error(data.error || 'Login gagal. Cek kembali email/password.')
-            }
-
-            commit('SET_USER', {
-                id: data.user.id,
-                email: data.user.email,
-                role: data.user.role,
-                token: data.token
-            })
-
-            return data.user
+            if (error) throw error
+            if (!data.session) return null
+            const user = await loadUser(data.user)
+            commit('SET_USER', user)
+            return user
         },
 
-        logout({ commit }) {
+        async login({ commit, dispatch }, { email, password }) {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+            if (error) {
+                throw new Error(error.message === 'Invalid login credentials'
+                    ? 'Email atau password salah.'
+                    : error.message)
+            }
+            const user = await loadUser(data.user)
+            commit('SET_USER', user)
+            dispatch('syncVisits')
+            return user
+        },
+
+        async logout({ commit }) {
+            await supabase.auth.signOut()
             commit('SET_USER', null)
         },
 
-        saveVisitOffline({ commit }, visit) {
-            commit('ADD_OFFLINE_VISIT', visit)
+        async submitVisit({ state, dispatch }, form) {
+            const result = await submitVisit(state.user.id, form)
+            await dispatch('refreshPending')
+            return result
+        },
+
+        async refreshPending({ state, commit }) {
+            if (!state.user) return
+            const queue = await getQueue()
+            commit('SET_PENDING', queue.filter(v => v.userId === state.user.id).length)
+        },
+
+        async syncVisits({ state, commit }) {
+            if (!state.user || state.user.role !== 'sales') return
+            commit('SET_PENDING', await syncQueue(state.user.id))
         }
     },
     getters: {
         isAuthenticated: state => !!state.user,
-        userRole: state => state.user ? state.user.role : null,
-        token: state => state.user ? state.user.token : null,
+        userRole: state => state.user ? state.user.role : null
     }
 })
+
+window.addEventListener('online', () => store.dispatch('syncVisits'))
+
+export default store

@@ -1,3 +1,6 @@
+-- LEGACY (backend Go). JANGAN dijalankan di Supabase PoC.
+-- Skema aktif ada di supabase/migrations/.
+
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE IF NOT EXISTS users (

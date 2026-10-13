@@ -1,12 +1,10 @@
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 
+// Komponen & directive di-import otomatis oleh vite-plugin-vuetify (autoImport),
+// sehingga hanya yang dipakai yang masuk ke bundle.
 export default createVuetify({
-    components,
-    directives,
     theme: {
         defaultTheme: 'light',
         themes: {

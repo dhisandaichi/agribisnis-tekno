@@ -1,9 +1,10 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark v-if="isAuthenticated">
+    <v-app-bar color="primary" v-if="user">
       <v-toolbar-title>SFA Agritec</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="logout">
+      <span class="text-body-2 mr-2 d-none d-sm-inline">{{ user.full_name || user.email }}</span>
+      <v-btn icon aria-label="Keluar" @click="logout">
         <v-icon>mdi-logout</v-icon>
       </v-btn>
     </v-app-bar>
@@ -19,13 +20,13 @@
 <script>
 export default {
   computed: {
-    isAuthenticated() {
-      return this.$store.getters.isAuthenticated
+    user() {
+      return this.$store.state.user
     }
   },
   methods: {
-    logout() {
-      this.$store.dispatch('logout')
+    async logout() {
+      await this.$store.dispatch('logout')
       this.$router.push('/login')
     }
   }

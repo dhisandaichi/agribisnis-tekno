@@ -1,44 +1,46 @@
 # Frontend Agritec - SFA Progressive Web App (Vue 3 + Vite)
 
-This is the frontend component of the Agritec Sales Force Automation application, built with Vue 3, Vite, and Vuetify. It is configured to run as a Progressive Web Application (PWA).
+Frontend aplikasi Sales Force Automation Agritec, dibangun dengan Vue 3, Vite, dan Vuetify, berjalan sebagai PWA.
+Untuk PoC, frontend terhubung **langsung ke Supabase** (Auth, Postgres + RLS, Storage). Backend Go di `../backend` tidak dipakai.
 
-## Infrastructure & Deployment
-The frontend is configured for deployment to **Vercel**, and temporarily will use **Supabase** as its backend database/auth (as an MVP substitute or complement for the Golang Microservices).
-
-### Environment Variables
-Before deploying, make sure you configure your Vercel project with the required API keys. Copy the `.env.example` file to a new file named `.env.local` to configure them for local development.
+## Environment Variables
+Salin `.env.example` ke `.env.local` untuk development lokal:
 
 ```bash
-# In the `frontend` directory:
 cp .env.example .env.local
 ```
 
-Required keys for Supabase:
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+| Variable | Keterangan |
+| --- | --- |
+| `VITE_SUPABASE_URL` | URL project Supabase, mis. `https://xxxx.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Publishable key (`sb_publishable_...`). Aman di browser karena akses data dibatasi RLS. |
 
-### Deployment to Vercel
+Aplikasi sengaja gagal start (error di console) jika salah satu variabel kosong.
 
-1. **Import the Project:** Go to the Vercel Dashboard and click "Add New Project" > "Import from Git".
-2. **Select Framework:** Once imported, Vercel should automatically detect **Vite**.
-3. **Configure Root Directory:** Make sure to set the Root Directory to `frontend`.
-4. **Environment Variables:** In the Vercel deploy configuration under "Environment Variables", paste the values from your Supabase Project Settings (URL and anon key).
-5. **Deploy:** Click deploy. Vercel will process the `vercel.json` file automatically to correctly route requests for your Single Page Application (SPA).
+## Deploy ke Vercel
+1. Import repo di Vercel, set **Root Directory** = `frontend`. Framework terdeteksi sebagai Vite dari `vercel.json`.
+2. Isi kedua environment variable di atas untuk Production dan Preview.
+3. Deploy. `vercel.json` sudah mengatur rewrite SPA, header keamanan, dan cache untuk service worker.
+4. Di Supabase > Authentication > URL Configuration, isi **Site URL** dan **Redirect URLs** dengan domain Vercel.
+
+## Fitur
+- **Auth & role**: Supabase Auth. Role disimpan di tabel `profiles`. Pendaftaran mandiri hanya untuk `sales` / `farmer`; `supervisor` diset admin.
+- **Kunjungan sales**: GPS + foto, dikompres di browser ke JPEG < 500 KB, lalu diunggah ke bucket privat `visit-photos`. Data disimpan lewat RPC `submit_visit` yang atomik dan idempoten.
+- **Offline**: app shell di-precache oleh service worker. Kunjungan yang dibuat saat offline disimpan di IndexedDB dan dikirim otomatis saat online.
+- **Dashboard supervisor**: ringkasan (`supervisor_summary`), kunjungan terbaru dengan foto (signed URL), dan saldo hutang distributor (`distributor_balances`).
+- Halaman petani masih konten statis (di luar cakupan PoC).
 
 ## Local Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Run local development server
-npm run dev
-
-# Build for production
-npm run build
+npm run dev      # development server
+npm run build    # build production ke dist/
+npm run preview  # jalankan hasil build
 ```
 
-## Features
-- **PWA Ready**: Offline caching, service workers, installable.
-- **Supabase Connected**: Pre-configured Supabase SDK client snippet at `src/services/supabase.js`.
-- **SPA Routing configured**: Includes fallbacks configured in Vercel.
+Ikon PWA dibuat dari `public/logo.svg`:
+
+```bash
+npx pwa-assets-generator --preset minimal-2023 public/logo.svg
+```
