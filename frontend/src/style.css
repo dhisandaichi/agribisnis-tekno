@@ -1,3 +1,25 @@
+:root {
+  --brand-green: #009a4a;
+  --brand-green-dark: #007a3a;
+  --brand-navy: #2e3192;
+  --brand-navy-dark: #1f2266;
+  --brand-orange: #f26b21;
+  --brand-font: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
 html, body { margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+body, .v-application { font-family: var(--brand-font); }
 .text-pre-wrap { white-space: pre-wrap; }
+
+/* App bar bermerek: gradasi hijau ke indigo seperti materi promosi Agrina 99 */
+.brand-appbar {
+  background: linear-gradient(100deg, var(--brand-green-dark) 0%, var(--brand-green) 45%, var(--brand-navy) 100%) !important;
+  color: #fff !important;
+}
+.brand-logo-badge {
+  background: #fff;
+  border-radius: 12px;
+  padding: 3px;
+  display: inline-flex;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+}
+.brand-logo-badge img { display: block; }
