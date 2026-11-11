@@ -41,3 +41,11 @@ Thumbs.db
 
 # Misc
 *.log
+
+# Local env & Vercel
+/frontend/.env.local
+.env.local
+.vercel
+/.env
+.env
+.env.production

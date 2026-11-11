@@ -10,26 +10,25 @@ export default defineConfig({
     vuetify({ autoImport: true }),
     VitePWA({
       registerType: 'autoUpdate',
+      includeAssets: ['apple-touch-icon.png'],
       manifest: {
         name: 'SFA Agritec',
         short_name: 'Agritec',
         description: 'Sales Force Automation for PT. Agribisnis Technology Indonesia',
+        lang: 'id',
         theme_color: '#4CAF50',
+        background_color: '#ffffff',
+        display: 'standalone',
+        start_url: '/',
         icons: [
-          {
-            src: '/pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
       },
       workbox: {
-        // configure offline caching
+        navigateFallbackDenylist: [/^\/api\//],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/api'),
@@ -37,18 +36,23 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               networkTimeoutSeconds: 5,
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          }
-        ]
-      }
-    })
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  server: {
+    // dev lokal: teruskan /api ke backend Go (go run ./backend/cmd/server)
+    proxy: { '/api': 'http://localhost:8080' },
+  },
+  build: {
+    chunkSizeWarningLimit: 900,
   },
 })
