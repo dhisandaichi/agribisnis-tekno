@@ -53,7 +53,7 @@ const store = createStore({
       setUnauthorizedHandler(() => {
         auth.token = null
         commit('SET_USER', null)
-        if (window.location.pathname !== '/login') window.location.assign('/login')
+        if (!['/', '/login', '/register'].includes(window.location.pathname)) window.location.assign('/login')
       })
       window.addEventListener('online', () => { commit('SET_ONLINE', true); dispatch('syncOfflineVisits') })
       window.addEventListener('offline', () => commit('SET_ONLINE', false))

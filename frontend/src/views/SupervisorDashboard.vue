@@ -294,9 +294,9 @@ export default {
     stats() {
       const s = this.summary
       return [
-        { title: 'Total Petani', subtitle: 'Terdata dari kunjungan', value: (s.farmers || 0).toLocaleString('id-ID'), icon: 'mdi-account-group', color: 'success' },
+        { title: 'Total Petani', subtitle: 'Terdata dari kunjungan', value: (s.farmers || 0).toLocaleString('id-ID'), icon: 'mdi-account-group', color: 'secondary' },
         { title: 'Kunjungan 7 Hari', subtitle: `${s.visits_today || 0} hari ini`, value: s.visits_7d || 0, icon: 'mdi-map-marker-check', color: 'primary' },
-        { title: 'Distributor / Kios', subtitle: `${s.overdue_distributors || 0} lewat jatuh tempo · ${s.pending_orders || 0} order menunggu harga`, value: s.distributors || 0, icon: 'mdi-store', color: 'info' },
+        { title: 'Distributor / Kios', subtitle: `${s.overdue_distributors || 0} lewat jatuh tempo · ${s.pending_orders || 0} order menunggu harga`, value: s.distributors || 0, icon: 'mdi-store', color: 'accent' },
         { title: 'Piutang Jatuh Tempo', subtitle: `Total belum lunas ${rupiah(s.outstanding_amount)}`, value: rupiah(s.overdue_amount), icon: 'mdi-cash-clock', color: 'error' },
       ]
     },

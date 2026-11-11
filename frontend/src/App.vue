@@ -1,7 +1,17 @@
 <template>
   <v-app>
-    <v-app-bar color="primary" density="comfortable" v-if="isAuthenticated">
-      <v-app-bar-title>SFA Agritec</v-app-bar-title>
+    <v-app-bar class="brand-appbar" density="comfortable" v-if="isAuthenticated && !isPublic">
+      <template #prepend>
+        <router-link to="/" class="brand-logo-badge ml-2" title="Beranda Agrina 99">
+          <img src="/brand/logo.png" alt="Logo Agrina 99" width="34" height="34" />
+        </router-link>
+      </template>
+      <v-app-bar-title>
+        <div style="line-height: 1.1">
+          <div class="font-weight-bold">SFA Agritec</div>
+          <div class="text-body-small d-none d-sm-block" style="opacity: .85">PT. Agribisnis Technology Indonesia</div>
+        </div>
+      </v-app-bar-title>
       <template #append>
         <v-chip v-if="!online" color="warning" variant="flat" size="small" class="mr-2" prepend-icon="mdi-wifi-off">
           Offline
@@ -50,6 +60,7 @@ export default {
   },
   computed: {
     isAuthenticated() { return this.$store.getters.isAuthenticated },
+    isPublic() { return !!this.$route.meta.public || !!this.$route.meta.guest },
     profile() { return this.$store.state.profile },
     online() { return this.$store.state.online },
     roleLabel() { return ROLE_LABELS[this.$store.getters.userRole] || '' },

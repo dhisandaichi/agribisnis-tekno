@@ -3,18 +3,22 @@ import store from '../store'
 import { homeForRole } from '../services/format'
 
 const routes = [
-  { path: '/', name: 'Home', redirect: '/login' },
+  { path: '/', name: 'Landing', component: () => import('../views/Landing.vue'), meta: { public: true } },
   { path: '/login', name: 'Login', component: () => import('../views/Login.vue'), meta: { guest: true } },
   { path: '/register', name: 'Register', component: () => import('../views/Register.vue'), meta: { guest: true } },
   { path: '/sales', name: 'SalesVisit', component: () => import('../views/SalesVisit.vue'), meta: { requiresAuth: true, role: 'sales' } },
   { path: '/supervisor', name: 'Supervisor', component: () => import('../views/SupervisorDashboard.vue'), meta: { requiresAuth: true, role: 'supervisor' } },
   { path: '/farmer', name: 'Farmer', component: () => import('../views/FarmerEducation.vue'), meta: { requiresAuth: true, role: 'farmer' } },
   { path: '/distributor', name: 'Distributor', component: () => import('../views/DistributorPortal.vue'), meta: { requiresAuth: true, role: 'distributor' } },
-  { path: '/:pathMatch(.*)*', redirect: '/login' },
+  { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
+  scrollBehavior(to) {
+    if (to.hash) return { el: to.hash, behavior: 'smooth', top: 72 }
+    return { top: 0 }
+  },
   routes,
 })
 
