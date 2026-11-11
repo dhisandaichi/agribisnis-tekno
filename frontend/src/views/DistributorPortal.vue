@@ -41,7 +41,7 @@
           <v-spacer />
           <v-btn color="primary" prepend-icon="mdi-cart-plus" @click="dialog = true">Ajukan Order</v-btn>
         </v-card-title>
-        <v-data-table :headers="headers" :items="orders" :loading="loading" items-per-page="10" no-data-text="Belum ada order">
+        <v-data-table :headers="headers" :items="orders" :loading="loading" items-per-page="10" :mobile="$vuetify.display.xs" no-data-text="Belum ada order">
           <template #item.order_date="{ item }">{{ tanggal(item.order_date) }}</template>
           <template #item.due_date="{ item }">{{ tanggal(item.due_date) }}</template>
           <template #item.total_amount="{ item }">{{ item.total_amount > 0 ? rupiah(item.total_amount) : 'Menunggu konfirmasi' }}</template>

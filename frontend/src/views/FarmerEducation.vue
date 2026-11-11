@@ -6,11 +6,17 @@
       <v-col cols="12" md="8">
         <v-alert v-if="!loading && !contents.length" type="info" variant="tonal">Belum ada konten edukasi.</v-alert>
         <v-card v-for="c in contents" :key="c.id" elevation="2" class="mb-4">
-          <v-img :src="c.thumbnail_url || defaultThumb" height="220" cover class="align-center justify-center text-center">
+          <v-img v-if="c.thumbnail_url" :src="c.thumbnail_url" height="200" cover class="align-center justify-center text-center">
             <v-btn v-if="c.video_url" icon size="x-large" variant="flat" color="white" :href="c.video_url" target="_blank" rel="noopener">
               <v-icon color="black" size="x-large">mdi-play</v-icon>
             </v-btn>
           </v-img>
+          <div v-else class="edu-thumb d-flex align-center justify-center">
+            <v-btn v-if="c.video_url" icon size="x-large" variant="flat" color="white" :href="c.video_url" target="_blank" rel="noopener">
+              <v-icon color="black" size="x-large">mdi-play</v-icon>
+            </v-btn>
+            <v-icon v-else size="64" color="white">mdi-sprout</v-icon>
+          </div>
           <v-card-title class="text-wrap">{{ c.title }}</v-card-title>
           <v-card-subtitle v-if="c.duration_minutes">Edukasi Tani · {{ c.duration_minutes }} menit</v-card-subtitle>
           <v-card-text class="text-pre-wrap">{{ c.description }}</v-card-text>
@@ -80,7 +86,6 @@ export default {
       loading: true,
       contents: [],
       prices: [],
-      defaultThumb: 'https://images.unsplash.com/photo-1592982537447-6f2a6a0c5c1b?auto=format&fit=crop&q=80&w=800',
       weather: { loading: true, error: null, now: null, next: [], location: '' },
     }
   },
@@ -111,3 +116,7 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.edu-thumb { height: 140px; background: linear-gradient(135deg, #2e7d32, #8bc34a); }
+</style>

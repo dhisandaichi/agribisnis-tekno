@@ -146,7 +146,11 @@ export default {
     req: (v) => (v !== null && v !== undefined && String(v).trim() !== '') || 'Wajib diisi',
     positive: (v) => Number(v) > 0 || 'Harus lebih dari 0',
     positiveOrEmpty: (v) => v === '' || v === null || Number(v) >= 0 || 'Tidak boleh negatif',
-    photoRule() { return !!this.form.photoDataUrl || 'Foto wajib diambil' },
+    photoRule() {
+      const f = this.photoFile
+      const picked = Array.isArray(f) ? f.length > 0 : !!f
+      return !!this.form.photoDataUrl || picked || 'Foto wajib diambil'
+    },
     mapUrl: (lat, lng) => `https://www.google.com/maps?q=${lat},${lng}`,
     notify(text, color = 'success') { this.snack = { show: true, text, color } },
 

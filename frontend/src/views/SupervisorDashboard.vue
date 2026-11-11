@@ -12,7 +12,7 @@
           <v-card-item>
             <template #prepend><v-icon size="36">{{ s.icon }}</v-icon></template>
             <v-card-title>{{ s.title }}</v-card-title>
-            <v-card-subtitle>{{ s.subtitle }}</v-card-subtitle>
+            <v-card-subtitle class="text-wrap">{{ s.subtitle }}</v-card-subtitle>
           </v-card-item>
           <v-card-text class="text-headline-large font-weight-bold">{{ s.value }}</v-card-text>
         </v-card>
@@ -39,7 +39,7 @@
             <v-spacer />
             <v-btn variant="outlined" prepend-icon="mdi-file-delimited" @click="exportVisits" :disabled="!visits.length">Ekspor CSV</v-btn>
           </div>
-          <v-data-table :headers="visitHeaders" :items="visitRows" :search="visitSearch" :loading="loading"
+          <v-data-table :mobile="$vuetify.display.xs" :headers="visitHeaders" :items="visitRows" :search="visitSearch" :loading="loading"
             items-per-page="10" no-data-text="Belum ada kunjungan pada periode ini">
             <template #item.visit_time="{ item }">{{ waktu(item.visit_time) }}</template>
             <template #item.gps="{ item }">
@@ -70,7 +70,7 @@
             <v-spacer />
             <v-btn color="primary" prepend-icon="mdi-plus" @click="openDistributor()">Tambah Distributor</v-btn>
           </div>
-          <v-data-table :headers="distHeaders" :items="distRows" items-per-page="10" no-data-text="Belum ada distributor">
+          <v-data-table :mobile="$vuetify.display.xs" :headers="distHeaders" :items="distRows" items-per-page="10" no-data-text="Belum ada distributor">
             <template #item.credit_limit_days="{ item }">{{ item.credit_limit_days ? `Tempo ${item.credit_limit_days} hari` : 'COD' }}</template>
             <template #item.outstanding="{ item }">{{ rupiah(item.outstanding) }}</template>
             <template #item.status="{ item }">
@@ -88,7 +88,7 @@
             <v-spacer />
             <v-btn color="primary" prepend-icon="mdi-cart-plus" :disabled="!distributors.length" @click="openOrder">Tambah Order</v-btn>
           </div>
-          <v-data-table :headers="orderHeaders" :items="orderRows" items-per-page="10" no-data-text="Belum ada order">
+          <v-data-table :mobile="$vuetify.display.xs" :headers="orderHeaders" :items="orderRows" items-per-page="10" no-data-text="Belum ada order">
             <template #item.order_date="{ item }">{{ tanggal(item.order_date) }}</template>
             <template #item.due_date="{ item }">{{ tanggal(item.due_date) }}</template>
             <template #item.total_amount="{ item }">{{ rupiah(item.total_amount) }}</template>
@@ -113,7 +113,7 @@
           </v-alert>
           <v-text-field v-model="userSearch" label="Cari pengguna" prepend-inner-icon="mdi-magnify" density="compact"
             variant="outlined" hide-details class="mb-3" style="max-width: 360px" />
-          <v-data-table :headers="userHeaders" :items="users" :search="userSearch" items-per-page="10">
+          <v-data-table :mobile="$vuetify.display.xs" :headers="userHeaders" :items="users" :search="userSearch" items-per-page="10">
             <template #item.created_at="{ item }">{{ tanggal(item.created_at) }}</template>
             <template #item.role="{ item }">
               <v-select :model-value="item.role" :items="roleItems" item-title="label" item-value="value"
