@@ -13,6 +13,7 @@
         <nav class="lp-nav__links">
           <a href="#produk">Produk</a>
           <a href="#cara-pakai">Cara Pakai</a>
+          <a href="#tanaman-buah">Tanaman Buah</a>
           <a href="#kemitraan">Kemitraan</a>
           <a href="#faq">FAQ</a>
         </nav>
@@ -49,12 +50,30 @@
           </ul>
         </div>
         <div class="lp-hero__visual">
-          <img src="/brand/products.jpg" alt="Kemasan Pupuk Organik Agrina 99, Dolomite Super Premium M100 dan Top Super Booster" />
+          <div class="lp-hero__stage" aria-hidden="true" />
+          <SackViewer />
           <div class="lp-hero__badge">
-            <div class="lp-hero__badge-num">3</div>
-            <div>produk yang saling<br />melengkapi</div>
+            <div class="lp-hero__badge-num">50 kg</div>
+            <div>berat bersih<br />per sak</div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- KAPASITAS PRODUKSI -->
+    <section class="lp-capacity" aria-labelledby="kapasitas-title">
+      <div class="lp-wrap lp-capacity__inner">
+        <div class="lp-capacity__main">
+          <div class="lp-capacity__label">Kapasitas Produksi</div>
+          <h2 id="kapasitas-title">Pupuk Organik Premium Agrina 99</h2>
+          <div class="lp-capacity__num">10.000 <span>Ton/Bulan</span></div>
+        </div>
+        <ul class="lp-capacity__facts">
+          <li v-for="f in capacityFacts" :key="f.label">
+            <v-icon size="26">{{ f.icon }}</v-icon>
+            <div><b>{{ f.value }}</b><span>{{ f.label }}</span></div>
+          </li>
+        </ul>
       </div>
     </section>
 
@@ -130,6 +149,33 @@
           <div class="lp-crops__list">
             <span v-for="c in crops" :key="c.name" class="lp-crop"><v-icon size="20">{{ c.icon }}</v-icon> {{ c.name }}</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TANAMAN BUAH -->
+    <section id="tanaman-buah" class="lp-section lp-section--tint">
+      <div class="lp-wrap">
+        <div class="lp-head">
+          <div class="lp-eyebrow">Edukasi petani</div>
+          <h2>Alasan pentingnya pemupukan untuk tanaman buah</h2>
+          <p>Tanaman buah dipanen berkali-kali dari pohon yang sama selama bertahun-tahun. Hara yang terbawa setiap panen harus dikembalikan agar pohon tetap berbuah lebat dan berkualitas.</p>
+        </div>
+        <div class="lp-fruit">
+          <div v-for="(r, i) in fruitReasons" :key="r.title" class="lp-fruit__item">
+            <div class="lp-fruit__num">{{ String(i + 1).padStart(2, '0') }}</div>
+            <v-icon size="30" class="lp-fruit__icon">{{ r.icon }}</v-icon>
+            <h3>{{ r.title }}</h3>
+            <p>{{ r.text }}</p>
+          </div>
+        </div>
+        <div class="lp-fruit__program">
+          <div class="lp-fruit__program-title"><v-icon>mdi-calendar-check-outline</v-icon> Waktu pemupukan yang disarankan</div>
+          <ol>
+            <li><b>Setelah panen.</b> Agrina 99 di piringan pohon untuk memulihkan tanah, ditambah Dolomite bila tanah masam.</li>
+            <li><b>Menjelang berbunga.</b> Top Super Booster agar bunga keluar serempak dan tidak mudah rontok.</li>
+            <li><b>Saat pembesaran buah.</b> Ulangi Agrina 99 sesuai anjuran supaya buah padat, manis, dan warnanya merata.</li>
+          </ol>
         </div>
       </div>
     </section>
@@ -216,6 +262,14 @@
 
     <!-- FOOTER -->
     <footer class="lp-footer">
+      <div class="lp-social">
+        <div class="lp-wrap lp-social__inner">
+          <span class="lp-social__title">Ikuti kami</span>
+          <a v-for="sc in social" :key="sc.label" :href="sc.href" target="_blank" rel="noopener" class="lp-social__link">
+            <span class="lp-social__icon"><v-icon size="18">{{ sc.icon }}</v-icon></span> {{ sc.label }}
+          </a>
+        </div>
+      </div>
       <div class="lp-wrap lp-footer__grid">
         <div>
           <div class="lp-brand mb-3">
@@ -237,8 +291,7 @@
           <a :href="waLink('Halo Agrina 99, saya ingin bertanya tentang produk.')" target="_blank" rel="noopener">
             <v-icon size="18">mdi-whatsapp</v-icon> {{ contact.phoneLabel }}
           </a>
-          <a href="https://www.instagram.com/pupukorganikagrina99" target="_blank" rel="noopener"><v-icon size="18">mdi-instagram</v-icon> pupukorganikagrina99</a>
-          <a href="https://www.tiktok.com/@pupukorganikagrina99" target="_blank" rel="noopener"><v-icon size="18">mdi-music-note</v-icon> pupukorganikagrina99</a>
+          <a v-for="sc in social" :key="'f-' + sc.label" :href="sc.href" target="_blank" rel="noopener"><v-icon size="18">{{ sc.icon }}</v-icon> {{ sc.label }}</a>
         </div>
         <div>
           <div class="lp-footer__title">Untuk mitra</div>
@@ -259,16 +312,47 @@
 
 <script>
 import { homeForRole } from '../services/format'
+import SackViewer from '../components/sack/SackViewer.vue'
 
 // Nomor informasi dari materi resmi Agrina 99. Ganti di sini bila tim penjualan memakai nomor lain.
 const CONTACT = { wa: '6282170425387', phoneLabel: '0821-7042-5387' }
 
+// Akun resmi dari materi promosi Agrina 99.
+// Alamat Facebook belum diketahui pasti, jadi sementara diarahkan ke pencarian nama halamannya.
+const SOCIAL = [
+  { icon: 'mdi-web', label: 'agritechindonesia.id', href: 'https://agritechindonesia.id' },
+  { icon: 'mdi-facebook', label: 'Pupuk Organik Agrina', href: 'https://www.facebook.com/search/top?q=pupuk%20organik%20agrina' },
+  { icon: 'mdi-instagram', label: 'pupukorganikagrina99', href: 'https://www.instagram.com/pupukorganikagrina99' },
+  { icon: 'mdi-music-note', label: 'pupukorganikagrina99', href: 'https://www.tiktok.com/@pupukorganikagrina99' },
+]
+
 export default {
+  components: { SackViewer },
   data() {
     return {
       scrolled: false,
       year: new Date().getFullYear(),
       contact: CONTACT,
+      social: SOCIAL,
+      capacityFacts: [
+        { icon: 'mdi-package-variant-closed', value: '± 200.000 sak', label: 'setara kemasan 50 kg per bulan' },
+        { icon: 'mdi-factory', value: 'Payakumbuh', label: 'pabrik di Sumatera Barat' },
+        { icon: 'mdi-truck-fast-outline', value: 'Partai besar', label: 'siap pasok distributor dan perkebunan' },
+      ],
+      fruitReasons: [
+        { icon: 'mdi-basket-outline', title: 'Mengganti hara yang terbawa panen',
+          text: 'Setiap kilogram buah yang dipetik membawa nitrogen, kalium dan unsur lain keluar dari kebun. Tanpa pemupukan, cadangan hara tanah terus menipis.' },
+        { icon: 'mdi-flower-outline', title: 'Bunga lebih banyak, tidak mudah rontok',
+          text: 'Fase berbunga butuh fosfor, boron dan kalsium yang cukup. Kekurangan unsur ini membuat bunga dan bakal buah mudah gugur.' },
+        { icon: 'mdi-fruit-grapes-outline', title: 'Buah lebih besar, manis dan berwarna',
+          text: 'Kalium, magnesium dan bahan organik membantu pembentukan gula dan warna, sehingga buah lebih bernas dan harga jualnya lebih baik.' },
+        { icon: 'mdi-sprout-outline', title: 'Akar kuat di tanah yang gembur',
+          text: 'Pohon buah tumbuh bertahun-tahun di tempat yang sama. Bahan organik menjaga tanah tetap gembur, kaya mikroba baik, dan mampu menahan air.' },
+        { icon: 'mdi-shield-sun-outline', title: 'Lebih tahan kemarau dan penyakit',
+          text: 'Tanaman yang cukup hara dan tumbuh di tanah sehat lebih kuat menghadapi kekeringan, serangan hama, dan penyakit.' },
+        { icon: 'mdi-chart-line', title: 'Panen stabil dari musim ke musim',
+          text: 'Pemupukan rutin membantu pohon pulih setelah berbuah lebat, sehingga hasil tidak naik turun tajam antar musim.' },
+      ],
       buyer: 'Petani',
       buyerTypes: ['Petani', 'Kelompok tani / Gapoktan', 'Kios / toko pertanian', 'Distributor', 'Perkebunan / perusahaan', 'Instansi / dinas'],
       order: { name: '', location: '', products: [], qty: '', crop: '' },
@@ -400,13 +484,48 @@ export default {
 .lp-hero__trust li { display: flex; align-items: center; gap: 8px; }
 .lp-hero__trust .v-icon { color: #7ee2a8; }
 .lp-hero__visual { position: relative; }
-.lp-hero__visual img { width: 100%; border-radius: 22px; box-shadow: 0 30px 60px rgba(0, 0, 0, .4); border: 4px solid rgba(255, 255, 255, .9); }
 .lp-hero__badge { position: absolute; left: -18px; bottom: -22px; display: flex; align-items: center; gap: 12px; background: #fff; color: #1f2266;
   border-radius: 16px; padding: 12px 18px; box-shadow: 0 12px 30px rgba(0, 0, 0, .25); font-size: 13px; font-weight: 600; line-height: 1.3; }
-.lp-hero__badge-num { font-size: 34px; font-weight: 800; color: var(--brand-orange); }
+.lp-hero__badge-num { font-size: 28px; font-weight: 800; color: var(--brand-orange); }
+
+/* SAK 3D DI HERO */
+.lp-hero__stage { position: absolute; left: 50%; top: 52%; width: 82%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(126, 226, 168, .38) 0%, rgba(126, 226, 168, .12) 45%, transparent 70%); pointer-events: none; }
+
+/* KAPASITAS */
+.lp-capacity { background: linear-gradient(100deg, #007a3a, #009a4a 55%, #0b8f4a); color: #fff; padding: 34px 0; position: relative; }
+.lp-capacity__inner { display: grid; grid-template-columns: 1.1fr 1.4fr; gap: 32px; align-items: center; }
+.lp-capacity__label { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #d4ffe6; }
+.lp-capacity h2 { font-size: 22px; font-weight: 700; margin: 2px 0 6px; }
+.lp-capacity__num { display: inline-block; background: #fff; color: #007a3a; font-size: clamp(28px, 4vw, 40px); font-weight: 800; border-radius: 14px; padding: 4px 18px; line-height: 1.3; }
+.lp-capacity__num span { font-size: .6em; font-weight: 700; }
+.lp-capacity__facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.lp-capacity__facts li { display: flex; gap: 12px; align-items: flex-start; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .22); border-radius: 16px; padding: 14px; }
+.lp-capacity__facts b { display: block; font-size: 17px; }
+.lp-capacity__facts span { display: block; font-size: 13px; opacity: .88; line-height: 1.4; }
+
+/* TANAMAN BUAH */
+.lp-fruit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.lp-fruit__item { position: relative; background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 1px 2px rgba(16, 24, 40, .05), 0 10px 30px rgba(16, 24, 40, .06); overflow: hidden; }
+.lp-fruit__num { position: absolute; top: 10px; right: 16px; font-size: 44px; font-weight: 800; color: #e6f5ec; line-height: 1; }
+.lp-fruit__icon { color: var(--brand-orange); margin-bottom: 10px; }
+.lp-fruit__item h3 { position: relative; font-size: 18px; color: #1f2266; margin: 0 0 8px; }
+.lp-fruit__item p { color: #5b6475; line-height: 1.6; margin: 0; font-size: 15px; }
+.lp-fruit__program { margin-top: 28px; background: #fff; border-left: 6px solid var(--brand-green); border-radius: 16px; padding: 20px 24px; }
+.lp-fruit__program-title { display: flex; gap: 8px; align-items: center; font-weight: 700; color: #1f2266; margin-bottom: 8px; }
+.lp-fruit__program-title .v-icon { color: var(--brand-green); }
+.lp-fruit__program ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: #3b4456; line-height: 1.6; }
+
+/* MEDIA SOSIAL */
+.lp-social { background: #009a4a; padding: 12px 0; margin: -56px 0 40px; }
+.lp-social__inner { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: center; }
+.lp-social__title { font-weight: 700; color: #fff; margin-right: 4px; }
+.lp-footer .lp-social__link { color: #fff; margin: 0; font-weight: 600; font-size: 14px; }
+.lp-social__icon { width: 28px; height: 28px; border-radius: 50%; background: #fff; color: #009a4a; display: inline-grid; place-items: center; }
+.lp-social__icon .v-icon { color: #009a4a; }
 
 /* SECTIONS */
-.lp-section { padding: 88px 0; }
+.lp-section { padding: 88px 0; scroll-margin-top: 64px; }
 .lp-section--tint { background: #f3f8f4; }
 .lp-section--navy { background: linear-gradient(160deg, #1f2266, #2e3192); color: #fff; }
 .lp-head { text-align: center; max-width: 720px; margin: 0 auto 48px; }
@@ -487,6 +606,8 @@ export default {
   .lp-hero__grid, .lp-order { grid-template-columns: 1fr; gap: 36px; }
   .lp-hero__badge { left: 12px; bottom: -18px; }
   .lp-problems, .lp-products, .lp-steps, .lp-partners { grid-template-columns: 1fr; }
+  .lp-fruit { grid-template-columns: 1fr 1fr; }
+  .lp-capacity__inner { grid-template-columns: 1fr; gap: 20px; }
   .lp-footer__grid { grid-template-columns: 1fr 1fr; }
   .lp-section { padding: 64px 0; }
 }
@@ -497,5 +618,7 @@ export default {
   .lp-hero__actions .v-btn { flex: 1 1 100%; }
   .lp-footer__grid { grid-template-columns: 1fr; }
   .lp-app { flex-direction: column; align-items: flex-start; }
+  .lp-fruit, .lp-capacity__facts { grid-template-columns: 1fr; }
+  .lp-social__inner { justify-content: flex-start; }
 }
 </style>
